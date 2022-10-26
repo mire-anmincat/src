@@ -5,3 +5,4 @@ linux-*
 *.tar.gz
 *.cpio.xz
 vmlinuz
+rootfs
