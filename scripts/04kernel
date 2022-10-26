@@ -1,0 +1,47 @@
+#!/bin/sh -e
+# shellcheck source=/dev/null
+
+if [ "$(whoami)" != "root" ]; then printf "This script need to run as root.\n" && exit 1; fi
+
+# load functions and config
+. scripts/functions
+. ./config
+
+[ -d dev_kernel ] && rm -rf dev_kernel
+
+(
+    mkdir dev_kernel && cd dev_kernel
+    tar xf ../alpine-minirootfs-"${ALPINE_VER}"-"${ARCH}".tar.gz
+)
+
+(
+    cd dev_kernel
+    wget https://cdn.kernel.org/pub/linux/kernel/v5.x/linux-"$KERNEL_VER".tar.xz
+    mkdir kernel && cd kernel
+    tar --strip-components=1 -xf ../linux-"$KERNEL_VER".tar.xz
+    cp ../../kernel/config-"$(uname -m)" .config
+    cp ../../kernel/*.patch .
+
+    for patch in *.patch; do
+        patch -p1 < "$patch"
+    done
+)
+
+# Mount pseudo-filesystems.
+trymount_dev
+resolvconf_dev
+
+# Update rootfs packages.
+exec_chroot_dev "apk update"
+exec_chroot_dev "apk upgrade"
+
+# Install tools.
+exec_chroot_dev "apk add build-base flex bison nasm linux-headers openssl-dev elfutils-dev perl xz diffutils"
+
+# Make bzImage and modules.
+exec_chroot_dev "cd kernel && make bzImage"
+exec_chroot_dev "cd kernel && make modules"
+
+unmount_dev
+
+mv dev_kernel/kernel/arch/x86/boot/bzImage vmlinuz

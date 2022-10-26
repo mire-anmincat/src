@@ -1,0 +1,22 @@
+#!/bin/sh -e
+# shellcheck source=/dev/null
+
+if [ "$(whoami)" != "root" ]; then printf "This script need to run as root.\n" && exit 1; fi
+
+# load functions and config
+. scripts/functions
+. ./config
+
+# Mount pseudo-filesystems.
+trymount_dev
+resolvconf_dev
+
+# Install kernel modules.
+exec_chroot_dev "cd kernel && make modules_install"
+
+unmount_dev
+
+mv dev_kernel/lib/modules rootfs/lib/modules
+
+unlink rootfs/lib/modules/"$KERNEL_VER"/build
+unlink rootfs/lib/modules/"$KERNEL_VER"/source

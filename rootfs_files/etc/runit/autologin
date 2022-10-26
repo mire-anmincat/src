@@ -1,0 +1,2 @@
+#!/bin/busybox ash
+exec /bin/login -f root

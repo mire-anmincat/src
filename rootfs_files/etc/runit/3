@@ -1,0 +1,13 @@
+#!/bin/busybox ash
+
+sv force-shutdown /var/service/* >/dev/null 2>&1
+
+kill 9 "$(pgrep udevd)"
+
+killall5 -TERM
+sleep 2
+
+killall5 -KILL
+
+mount -o remount,ro /
+sync

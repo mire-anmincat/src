@@ -1,0 +1,7 @@
+cdroot
+dev_kernel
+distrb
+linux-*
+*.tar.gz
+*.cpio.xz
+vmlinuz

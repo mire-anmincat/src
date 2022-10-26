@@ -1,0 +1,55 @@
+#!/bin/sh -e
+# shellcheck source=/dev/null
+
+if [ "$(whoami)" != "root" ]; then printf "This script need to run as root.\n" && exit 1; fi
+
+# load functions and config.
+. scripts/functions
+. ./config
+
+[ -d cdroot ] && rm -rf cdroot
+[ -d release ] && rm -rf release
+
+if [ ! -d cdroot ]; then
+	mkdir -pv cdroot/EFI/boot/
+	mkdir -pv cdroot/boot/grub
+	mkdir -v cdroot/isolinux
+fi
+
+[ ! -d distrb ] && mkdir -v distrb
+
+cp -rv bootloaders/BIOS/* cdroot/isolinux
+cp -v bootloaders/UEFI/grub.cfg cdroot/boot/grub
+cp -v bootloaders/UEFI/bootx64.efi cdroot/EFI/boot
+cp -v rootfs.cpio.xz cdroot/boot
+cp -v vmlinuz cdroot/boot
+
+dd if=/dev/zero of=cdroot/boot/grub/efi.img bs=1M count=1
+mkfs.vfat cdroot/boot/grub/efi.img
+mmd -i cdroot/boot/grub/efi.img efi efi/boot
+mcopy -vi cdroot/boot/grub/efi.img bootloaders/UEFI/bootx64.efi ::efi/boot/
+
+xorriso \
+    -as mkisofs \
+    -iso-level 3 \
+    -o "distrb/$ISO_NAME.iso" \
+    -full-iso9660-filenames \
+    -volid "ANMINCAT" \
+    -isohybrid-mbr /usr/share/syslinux/isohdpfx.bin \
+    -eltorito-boot \
+        isolinux/isolinux.bin \
+        -no-emul-boot \
+        -boot-load-size 4 \
+        -boot-info-table \
+        --eltorito-catalog isolinux/isolinux.cat \
+    -eltorito-alt-boot \
+        -e /boot/grub/efi.img \
+        -no-emul-boot \
+        -isohybrid-gpt-basdat \
+    -append_partition 2 0xef cdroot/boot/grub/efi.img \
+    "cdroot"
+
+sha256sum distrb/"$ISO_NAME".iso > distrb/"$ISO_NAME".sha256
+cat distrb/"$ISO_NAME".sha256
+
+chown 5000:5000 -R distrb/

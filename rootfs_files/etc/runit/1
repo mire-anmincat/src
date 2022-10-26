@@ -1,0 +1,37 @@
+#!/bin/busybox ash
+
+fatal() {
+    printf "Something went very wrong, dropping you to emergency shell.\n"
+    /bin/sh
+}
+
+dmesg -n 1
+clear
+mount -t proc -o nodev,noexec,nosuid proc /proc
+mount -t sysfs -o nodev,noexec,nosuid sys /sys
+mount -t tmpfs -o nodev,nosuid,mode=0755 run /run
+mount -t devtmpfs -o nosuid,mode=0755 dev /dev
+
+mkdir -p /run/runit/runsvdir /run/user /run/lock /dev/pts /dev/shm
+
+mount -t devpts -o mode=0620,gid=5,nosuid,noexec devpts /dev/pts
+mount -t tmpfs -o mode=1777,nosuid,nodev shm /dev/pts
+
+mount -o remount,rw / || fatal
+
+export LANG=C
+export LC_ALL="$LANG"
+
+cat /etc/hostname > /proc/sys/kernel/hostname
+
+ifconfig lo up 127.0.0.1
+
+umount -n -l /dev/pts
+/sbin/udevd --daemon || fatal
+udevadm hwdb --update || fatal
+udevadm trigger --type=subsystems --action=add || fatal
+sleep 0.5
+udevadm trigger --type=devices --action=add || fatal
+sleep 0.5
+udevadm settle || fatal
+mount -t proc -o nodev,noexec,nosuid proc /proc

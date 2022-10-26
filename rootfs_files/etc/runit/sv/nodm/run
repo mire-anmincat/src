@@ -1,0 +1,5 @@
+#!/bin/sh
+export NODM_USER="root"
+export NODM_X_OPTIONS="-nolisten tcp"
+
+nodm

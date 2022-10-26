@@ -1,0 +1,2 @@
+#!/bin/sh
+exec /sbin/runit-init 0

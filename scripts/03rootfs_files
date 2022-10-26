@@ -1,0 +1,34 @@
+#!/bin/sh -e
+# shellcheck source=/dev/null
+
+if [ "$(whoami)" != "root" ]; then printf "This script need to run as root.\n" && exit 1; fi
+
+# load functions and config.
+. scripts/functions
+. ./config
+
+cp -fv rootfs_files/init                rootfs
+cp -fv rootfs_files/etc/fstab           rootfs/etc
+cp -fv rootfs_files/etc/group           rootfs/etc
+cp -fv rootfs_files/etc/hostname        rootfs/etc
+cp -fv rootfs_files/etc/mime.types      rootfs/etc
+cp -fv rootfs_files/etc/motd            rootfs/etc
+cp -fv rootfs_files/etc/os-release      rootfs/etc
+cp -fv rootfs_files/etc/passwd          rootfs/etc
+cp -fv rootfs_files/etc/shadow          rootfs/etc
+cp -fv rootfs_files/etc/system.jwmrc    rootfs/etc
+cp -rv rootfs_files/etc/runit           rootfs/etc
+cp -fv rootfs_files/etc/X11/Xsession    rootfs/etc/X11
+cp -rv rootfs_files/usr/share/fonts/TTF rootfs/usr/share/fonts
+cp -rv rootfs_files/root                rootfs
+
+[ -L rootfs/sbin/halt ] && unlink rootfs/sbin/halt
+[ -L rootfs/sbin/poweroff ] && unlink rootfs/sbin/poweroff
+[ -L rootfs/sbin/reboot ] && unlink rootfs/sbin/reboot
+cp -fv rootfs_files/sbin/halt           rootfs/sbin
+cp -fv rootfs_files/sbin/poweroff       rootfs/sbin
+cp -fv rootfs_files/sbin/reboot         rootfs/sbin
+chmod 755 rootfs/sbin/halt
+chmod 755 rootfs/sbin/poweroff
+chmod 755 rootfs/sbin/reboot
+chmod 755 rootfs/etc/X11/Xsession

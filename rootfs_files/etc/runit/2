@@ -1,0 +1,17 @@
+#!/bin/busybox ash
+
+PATH=/bin:/sbin:/usr/bin:/usr/sbin
+
+case "$(cat /proc/cmdline)" in
+    *gui*)
+        export init_profile="gui"
+        ;;
+    *)
+        export init_profile="console"
+        ;;
+esac
+
+ln -sv /etc/runit/runsvdir/"$init_profile" /run/runit/runsvdir/current
+
+exec env - PATH=$PATH \
+    runsvdir -P /run/runit/runsvdir/current 'log: ...........................................................................................................................................................................................................................................................................................................................................................................................................'

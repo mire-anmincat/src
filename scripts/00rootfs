@@ -1,0 +1,23 @@
+#!/bin/sh -e
+# shellcheck source=/dev/null
+
+if [ "$(whoami)" != "root" ]; then printf "This script need to run as root.\n" && exit 1; fi
+
+# load functions and config.
+. scripts/functions
+. ./config
+
+# Obtain Alpine Linux minirootfs tarball.
+wget -nc  https://dl-cdn.alpinelinux.org/alpine/v"$(echo "$ALPINE_VER" | cut -b 1-4)"/releases/"${ARCH}"/alpine-minirootfs-"${ALPINE_VER}"-"${ARCH}".tar.gz
+mkdir rootfs
+(cd rootfs && tar xf ../"alpine-minirootfs-${ALPINE_VER}-${ARCH}.tar.gz")
+
+# Mount pseudo-filesystems.
+trymount
+resolvconf
+
+# Update rootfs packages.
+exec_chroot "apk update"
+exec_chroot "apk upgrade"
+
+unmount

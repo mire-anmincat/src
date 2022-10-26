@@ -1,0 +1,14 @@
+#!/bin/sh -e
+# shellcheck source=/dev/null
+
+if [ "$(whoami)" != "root" ]; then printf "This script need to run as root.\n" && exit 1; fi
+
+# load functions and config.
+. scripts/functions
+. ./config
+
+[ -f "rootfs.gz" ] && rm rootfs.gz
+
+cd rootfs
+
+find . | cpio -o -H newc | xz -9 --check=crc32 > ../rootfs.cpio.xz

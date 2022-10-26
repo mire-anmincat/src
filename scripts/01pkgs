@@ -1,0 +1,41 @@
+#!/bin/sh -e
+# shellcheck source=/dev/null
+
+if [ "$(whoami)" != "root" ]; then printf "This script need to run as root.\n" && exit 1; fi
+
+# load functions and config
+. scripts/functions
+. ./config
+
+# Mount pseudo-filesystems.
+trymount
+
+# Install tools pacakges.
+for pkg in $TOOLS_PKGS; do
+    exec_chroot "apk add $pkg"
+done
+
+# Install net tools packages.
+for pkg in $NET_PKGS; do
+    exec_chroot "apk add $pkg"
+done
+
+# Install xorg packages.
+for pkg in $XORG_PKGS; do
+    exec_chroot "apk add $pkg"
+done
+
+# Install xorg packages.
+for pkg in $XAPPS_PKGS; do
+    exec_chroot "apk add $pkg"
+done
+
+# Install custom packages.
+for pkg in $CUSTOM_PKGS; do
+    (cd rootfs && wget -nc "$pkg")
+    exec_chroot "cd / && tar xf ${pkg##*/}"
+    rm rootfs/"${pkg##*/}"
+done
+find rootfs/ -maxdepth 1 -name ".*" -type f -exec rm {} \; -print
+
+unmount

@@ -1,0 +1,29 @@
+VERSION="1.8"
+ARCH="$(uname -m)"
+ALPINE_VER="3.16.2"
+KERNEL_VER="5.15.72"
+ISO_NAME="mire-anmincat-${ARCH}-current"
+
+TOOLS_PKGS="ntfs-3g ntfs-3g-progs testdisk dosfstools e2fsprogs fuse-exfat-utils
+            sfdisk cfdisk parted htop blkid ddrescue fsarchiver memtester cabextract
+            chntpw mdadm lvm2 runit gpm eudev udevil bash mc"
+
+NET_PKGS="openssl curl dropbear rsync"
+
+XORG_PKGS="xorg-server xf86-video-nouveau xf86-video-ati xf86-video-amdgpu
+           xf86-video-intel xf86-input-evdev font-cursor-misc fontconfig"
+
+XAPPS_PKGS="gtk+2.0 linux-pam gtkmm atkmm glibmm pangomm cairomm libsigc++
+            jwm xterm"
+
+CUSTOM_PKGS="
+https://raw.githubusercontent.com/mire-anmincat/repo/master/${ARCH}/nodm-92081f1-r0.apk
+https://raw.githubusercontent.com/mire-anmincat/repo/master/${ARCH}/vte-0.28.2-r14.apk
+https://raw.githubusercontent.com/mire-anmincat/repo/master/${ARCH}/sakura-gtk2-2.4.2-r0.apk
+https://raw.githubusercontent.com/mire-anmincat/repo/master/${ARCH}/spacefm-1.0.6-r2.apk
+https://raw.githubusercontent.com/mire-anmincat/repo/master/${ARCH}/leafpad-0.8.18.1-r0.apk
+https://raw.githubusercontent.com/mire-anmincat/repo/master/${ARCH}/gtkdialog-0.8.5-r0.apk
+https://dl-cdn.alpinelinux.org/alpine/v3.9/main/${ARCH}/gparted-0.33.0-r0.apk
+https://dl-cdn.alpinelinux.org/alpine/edge/testing/${ARCH}/viewnior-1.8-r0.apk
+https://dl-cdn.alpinelinux.org/alpine/v3.11/community/${ARCH}/xarchiver-0.5.4.14-r0.apk
+"

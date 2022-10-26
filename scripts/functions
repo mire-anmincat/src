@@ -1,0 +1,56 @@
+#!/bin/sh -e
+
+info() {
+    printf "%s\n" "$1"
+}
+
+die() {
+    printf "%s\n" "$1"
+    exit 1
+}
+
+check_tool() {
+    printf "Checking for %s..." "$1"
+    command -v "$1" || die "Not found, Please install $1."
+}
+
+unmount() {
+    umount -l rootfs/proc
+    umount -l rootfs/sys
+    umount -l rootfs/dev
+}
+
+trymount() {
+    mountpoint -q rootfs/proc || mount --bind /proc rootfs/proc
+    mountpoint -q rootfs/sys  || mount --bind /sys rootfs/sys
+    mountpoint -q rootfs/dev  || mount --rbind /dev rootfs/dev
+}
+
+resolvconf() {
+    [ -f "/etc/resolv.conf" ] && cp /etc/resolv.conf rootfs/etc/resolv.conf
+}
+
+exec_chroot() {
+    chroot rootfs/ sh -c "$1" || unmount
+}
+
+# dev
+unmount_dev() {
+    umount -l dev_kernel/proc
+    umount -l dev_kernel/sys
+    umount -l dev_kernel/dev
+}
+
+trymount_dev() {
+    mountpoint -q dev_kernel/proc || mount --bind /proc dev_kernel/proc
+    mountpoint -q dev_kernel/sys  || mount --bind /sys dev_kernel/sys
+    mountpoint -q dev_kernel/dev  || mount --rbind /dev dev_kernel/dev
+}
+
+resolvconf_dev() {
+    [ -f "/etc/resolv.conf" ] && cp /etc/resolv.conf dev_kernel/etc/resolv.conf
+}
+
+exec_chroot_dev() {
+    chroot dev_kernel/ sh -c "$1" || unmount_dev
+}
