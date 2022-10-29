@@ -11,3 +11,5 @@ killall5 -KILL
 
 mount -o remount,ro /
 sync
+
+[ -f /tmp/kexec-helper.boot ] && kexec -e 2>/dev/null

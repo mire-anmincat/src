@@ -1,0 +1,77 @@
+#!/bin/sh
+
+[ "$(pgrep Xorg)" = "" ] && printf "Required to run Xorg.\n" && exit 1
+
+export MAIN_DIALOG='
+<window title="netconfig" resizable="no" window_position="3">
+    <vbox>
+        <vbox>
+            <hbox>
+                <text>
+                    <label>Interface:</label>
+                </text>
+                <entry>
+                    <variable>INTERFACE</variable>
+                </entry>
+            </hbox>
+            <hbox>
+                <text>
+                    <label>Hostname:</label>
+                </text>
+                <entry>
+                    <input file>/etc/hostname</input>
+                    <variable>HOSTNAME</variable>
+                </entry>
+            </hbox>
+            <checkbox>
+                <label>Automatic (DHCP)</label>
+                <variable>DHCP</variable>
+            </checkbox>
+        </vbox>
+        <vbox>
+            <checkbox>
+                <label>Manual</label>
+                <variable>MANUAL</variable>
+            </checkbox>
+        </vbox>
+        <frame Manual settings>
+            <hbox>
+                <text>
+                    <label>Address:</label>
+                </text>
+                <entry>
+                    <variable>ADDRESS</variable>
+                </entry>
+            </hbox>
+            <hbox>
+                <text>
+                    <label>Netmask:</label>
+                </text>
+                <entry>
+                    <variable>NETMASK</variable>
+                </entry>
+            </hbox>
+            <hbox>
+                <text>
+                    <label>Gateway:</label>
+                </text>
+                <entry>
+                    <variable>GATEWAY</variable>
+                </entry>
+            </hbox>
+        </frame>
+        <hbox>
+            <button ok></button>
+            <button cancel></button>
+        </hbox>
+    </vbox>
+</window>
+'
+
+eval "$(gtkdialog -p MAIN_DIALOG)"
+
+case $EXIT in
+    *)
+        exit 0
+    ;;
+esac

@@ -7,6 +7,8 @@ if [ "$(whoami)" != "root" ]; then printf "This script need to run as root.\n" &
 . scripts/functions
 . ./config
 
+mkdir rootfs/etc/sysconfig
+
 cp -fv rootfs_files/init                rootfs
 cp -fv rootfs_files/etc/fstab           rootfs/etc
 cp -fv rootfs_files/etc/group           rootfs/etc
@@ -28,7 +30,13 @@ cp -rv rootfs_files/root                rootfs
 cp -fv rootfs_files/sbin/halt           rootfs/sbin
 cp -fv rootfs_files/sbin/poweroff       rootfs/sbin
 cp -fv rootfs_files/sbin/reboot         rootfs/sbin
+cp -fv rootfs_files/sbin/powermenu      rootfs/sbin
+cp -fv rootfs_files/sbin/kexec-helper   rootfs/sbin
+cp -fv rootfs_files/sbin/netconfig      rootfs/sbin
 chmod 755 rootfs/sbin/halt
 chmod 755 rootfs/sbin/poweroff
 chmod 755 rootfs/sbin/reboot
+chmod 755 rootfs/sbin/powermenu
+chmod 755 rootfs/sbin/kexec-helper
+chmod 755 rootfs/sbin/netconfig
 chmod 755 rootfs/etc/X11/Xsession

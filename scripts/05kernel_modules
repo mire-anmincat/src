@@ -12,7 +12,7 @@ trymount_dev
 resolvconf_dev
 
 # Install kernel modules.
-exec_chroot_dev "cd kernel && make modules_install"
+exec_chroot_dev "cd kernel; make INSTALL_MOD_STRIP=1 modules_install"
 
 unmount_dev
 

@@ -1,0 +1,172 @@
+#!/bin/sh
+# shellcheck disable=2016
+
+[ "$(pgrep Xorg)" = "" ] && printf "Required to run Xorg.\n" && exit 1
+
+die () {
+    export ERROR="$1"
+    export ERROR_DIALOG='
+    <window title="kexec-helper" resizable="false" window_position="1">
+        <vbox>
+            <text>
+                <input>echo $ERROR</input>
+            </text>
+            <hbox>
+                <button ok></button>
+            </hbox>
+        </vbox>
+    </window>
+    '
+    
+    gtkdialog -p ERROR_DIALOG 1>/dev/null
+    exit 1
+}
+
+export MAIN_DIALOG='
+<window title="kexec-helper" resizable="false" window_position="1">
+    <vbox>
+        <vbox>
+            <text><label>This is an EXPERIMENT tool, USE AT YOUR OWN RISK.</label></text>
+        </vbox>
+        <frame New kernel (Required)>
+            <hbox>
+                <entry>
+                    <default>/path/to/vmlinuz</default>
+                    <variable>KERNEL</variable>
+                </entry>
+                <button>
+                    <label>Choose</label>
+                    <action type="fileselect">KERNEL</action>
+                </button>
+            </hbox>
+            <vbox>
+                <checkbox>
+                    <label>Real mode</label>
+                    <variable>REALMODE</variable>
+                </checkbox>
+            </vbox>
+        </frame>
+        <frame New initrd>
+            <hbox>
+                <entry>
+                    <variable>INITRD</variable>
+                </entry>
+                <button>
+                    <label>Choose</label>
+                    <action type="fileselect">INITRD</action>
+                </button>
+            </hbox>
+        </frame>
+        <frame Append>
+            <hbox>
+                <entry>
+                    <variable>APPEND</variable>
+                </entry>
+            </hbox>
+        </frame>
+        <frame Advanced options>
+            <vbox>
+                <checkbox>
+                    <label>Prepare ELF32 core headers</label>
+                    <variable>ELF32</variable>
+                </checkbox>
+                <checkbox>
+                    <label>Prepare ELF64 core headers</label>
+                    <variable>ELF64</variable>
+                </checkbox>
+                <checkbox>
+                    <label>Enable VGA console</label>
+                    <variable>ENABLE_VGA</variable>
+                </checkbox>
+                <checkbox>
+                    <label>Reset VGA</label>
+                    <variable>RESET_VGA</variable>
+                </checkbox>
+            </vbox>
+        </frame>
+        <frame Serial>
+            <vbox>
+                <checkbox>
+                    <label>Enable serial console</label>
+                    <variable>ENABLE_SERIAL</variable>
+                </checkbox>
+            </vbox>
+            <hbox>
+                <text>
+                    <label>Port:</label>
+                </text>
+                <entry>
+                    <variable>SERIAL_PORT</variable>
+                </entry>
+            </hbox>
+            <hbox>
+                <text>
+                    <label>Baud:</label>
+                </text>
+                <entry>
+                    <variable>SERIAL_BAUD</variable>
+                </entry>
+            </hbox>
+        </frame>
+        <hbox>
+        <button>
+            <label>Boot</label>
+        </button>
+        <button cancel></button>
+        </hbox>
+    </vbox>
+</window>
+'
+
+eval "$(gtkdialog -p MAIN_DIALOG)"
+
+if [ "$EXIT" != "Boot" ]; then
+    exit 0
+fi
+
+[ "$KERNEL" = "" ] && die "'New kernel' can't be empty!"
+[ ! -f "$KERNEL" ] && die "Kernel not found, please check path for kernel!"
+
+if [ "$ELF32" = "true" ]  && [ "$ELF64" = "true" ]; then
+    die "Loading both of ELF32/64 core headers is not possible."
+fi
+
+[ -f /tmp/kexec-helper.boot ] && rm -rf /tmp/kexec-helper.boot
+printf "#!/bin/sh\n" >> /tmp/kexec-helper.boot
+printf "kexec -l %s " "$KERNEL" >> /tmp/kexec-helper.boot
+[ "$APPEND" != "" ] && \
+        printf "%s " "--append=$APPEND" >> /tmp/kexec-helper.boot
+        
+[ "$INITRD" != "" ] && \
+        printf "%s " "--initrd=$INITRD" >> /tmp/kexec-helper.boot
+        
+[ "$REALMODE" = "true" ] && \
+        printf "%s " "--real-mode" >> /tmp/kexec-helper.boot
+        
+[ "$ENABLE_SERIAL" = "true" ] && \
+        printf "%s " "--console-serial" >> /tmp/kexec-helper.boot
+        
+[ "$ENABLE_VGA" = "true" ] && \
+        printf "%s " "--console-vga" >> /tmp/kexec-helper.boot
+        
+[ "$ELF32" = "true" ] && \
+        printf "%s " "--elf32-core-headers" >> /tmp/kexec-helper.boot
+        
+[ "$ELF64" = "true" ] && \
+        printf "%s " "--elf64-core-headers" >> /tmp/kexec-helper.boot
+
+[ "$RESET_VGA" = "true" ] && \
+        printf "%s " "--reset-vga" >> /tmp/kexec-helper.boot
+
+[ "$SERIAL_PORT" != "" ] && \
+        printf "%s " "--serial=$SERIAL_PORT" >> /tmp/kexec-helper.boot
+
+[ "$SERIAL_BAUD" != "" ] && \
+        printf "%s " "--serial-baud=$SERIAL_BAUD" >> /tmp/kexec-helper.boot
+        
+printf "\n" >> /tmp/kexec-helper.boot
+chmod 755 /tmp/kexec-helper.boot
+cat /tmp/kexec-helper.boot
+
+/tmp/kexec-helper.boot
+exec runit-init 6

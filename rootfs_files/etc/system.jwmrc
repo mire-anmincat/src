@@ -3,46 +3,55 @@
 
     <!-- The root menu. -->
     <RootMenu onroot="12">
-        <Program icon="utilities-terminal" label="Terminal">sakura</Program>
-        <Menu icon="folder" label="Applications">
-            <Program icon="system-file-manager" label="ROX">rox ~</Program>
+        <Menu icon="folder" label="Term">
+            <Program icon="" label="Sakura (ash)">sakura -e ash</Program>
+            <Program icon="" label="Sakura (bash)">sakura -e bash</Program>
+            <Program icon="" label="XTerm (ash)">xterm -e ash</Program>
+            <Program icon="" label="XTerm (bash)">xterm -e bash</Program>
         </Menu>
-        <Menu icon="folder" label="Utilities">
-            <Program icon="font" label="Fonts">xfontsel</Program>
-            <Program icon="info" label="Window Properties">
-                xprop | xmessage -file -
-            </Program>
-            <Program icon="info" label="Window Information">
-                xwininfo | xmessage -file -
-            </Program>
+        <Menu icon="folder" label="File Manager">
+            <Program icon="" label="SpaceFM">spacefm</Program>
+        </Menu>
+        <Menu icon="folder" label="HDD tools">
+            <Program icon="" label="GParted">gparted</Program>
+            <Program icon="" label="DDrescueView">ddrescueview</Program>
+        </Menu>
+        <Menu icon="folder" label="Monitor Tools">
+            <Program icon="" label="Htop">sakura -e htop</Program>
+        </Menu>
+        <Menu icon="folder" label="Misc Tools">
+            <Program icon="" label=""></Program>
+        </Menu>
+        <Menu icon="folder" label="Services">
+            <Menu icon="" label="Dropbear">
+                <Program icon="" label="Start"></Program>
+                <Program icon="" label="Stop"></Program>
+                <Program icon="" label="Setup"></Program>
+            </Menu>
+            <Menu icon="" label="DarkHTTPD">
+                <Program icon="" label="Start"></Program>
+                <Program icon="" label="Stop"></Program>
+                <Program icon="" label="Setup"></Program>
+            </Menu>
+            <Menu icon="" label="PureFTPd">
+                <Program icon="" label="Start"></Program>
+                <Program icon="" label="Stop"></Program>
+                <Program icon="" label="Setup"></Program>
+            </Menu>
         </Menu>
         <Separator/>
-        <Program icon="lock" label="Lock">
-           xscreensaver-command -lock
-        </Program>
-        <Separator/>
-        <Restart label="Restart" icon="reload"/>
-        <Exit label="Exit" confirm="true" icon="exit"/>
+        <Menu icon="" label="Settings">
+            <Program icon="" label="Network configuration">netconfig</Program>
+        </Menu>
+        <Program icon="" label="About">mireanmincat-about</Program>
+        <Program icon="" label="Restart X">pkill nodm</Program>
+        <Program icon="" label="Power">powermenu</Program>
     </RootMenu>
-
-    <!-- Options for program groups. -->
-    <Group>
-        <Option>tiled</Option>
-    </Group>
-    <Group>
-        <Name>xterm</Name>
-        <Option>vmax</Option>
-    </Group>
-    <Group>
-        <Name>xclock</Name>
-        <Option>drag</Option>
-        <Option>notitle</Option>
-    </Group>
 
     <!-- Tray at the bottom. -->
     <Tray x="0" y="-1" height="20" autohide="off" delay="1000">
 
-        <TrayButton label="JWM">root:1</TrayButton>
+        <TrayButton label="MENU">root:1</TrayButton>
         <Spacer width="2"/>
         <TrayButton label="_">showdesktop</TrayButton>
         <Spacer width="2"/>
@@ -74,7 +83,7 @@
     <TrayStyle group="false" list="desktop">
         <Opacity>0.8</Opacity>
         <Font>Karla-10</Font>
-        <Outline>#5B5B5D</Outline>
+        <Outline>#000000</Outline>
         <Foreground>#FFFFFF</Foreground>
         <Background>#000000:#343434</Background>
         <Active>
@@ -95,12 +104,12 @@
     </PagerStyle>
     <MenuStyle>
         <Font>Karla-10</Font>
-            <Foreground>#323232</Foreground>
-            <Background>#FCFCFC</Background>
+            <Foreground>#FFFFFF</Foreground>
+            <Background>#000000</Background>
         <Outline>#CDC7C2</Outline>
         <Active>
-            <Foreground>#FCFCFC</Foreground>
-            <Background>#3584E4</Background>
+            <Foreground>#000000</Foreground>
+            <Background>#FFFFFF</Background>
         </Active>
     </MenuStyle>
     <PopupStyle>
@@ -119,7 +128,7 @@
 
     <!-- Virtual Desktops -->
     <!-- Desktop tags can be contained within Desktops for desktop names. -->
-    <Desktops width="4" height="1">
+    <Desktops width="2" height="1">
         <!-- Default background. Note that a Background tag can be
               contained within a Desktop tag to give a specific background
               for that desktop.

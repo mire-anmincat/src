@@ -1,0 +1,53 @@
+#!/bin/sh
+
+[ "$(pgrep Xorg)" = "" ] && printf "Required to run Xorg.\n" && exit 1
+
+export MAIN_DIALOG='
+<window title="powermenu" window_position="3" decorated="false" type-hint="6" skip_taskbar_hint="true">
+    <vbox>
+        <hbox>
+            <button>
+                <label>Poweroff/Halt</label>
+            </button>
+            <button>
+                <label>Reboot</label>
+            </button>
+            <button>
+                <label>RestartX</label>
+            </button>
+            <button>
+                <label>QuitGUI</label>
+            </button>
+            <button>
+                <label>KexecBoot</label>
+            </button>
+            <button cancel></button>
+        </hbox>
+    </vbox>
+</window>
+'
+
+eval "$(gtkdialog -p MAIN_DIALOG)"
+
+case $EXIT in
+    Poweroff/Halt)
+        poweroff
+    ;;
+    Reboot)
+        reboot
+    ;;
+    RestartX)
+        pkill Xorg
+    ;;
+    QuitGUI)
+        sv down /run/runit/runsvdir/current/nodm
+        ln -s /etc/runit/sv/getty-tty1 /run/runit/runsvdir/current/
+        ln -s /etc/runit/sv/getty-tty2 /run/runit/runsvdir/current/
+    ;;
+    KexecBoot)
+        kexec-helper
+    ;;
+    *)
+        exit 0
+    ;;
+esac

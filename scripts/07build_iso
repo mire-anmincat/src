@@ -24,6 +24,10 @@ cp -v bootloaders/UEFI/bootx64.efi cdroot/EFI/boot
 cp -v rootfs.cpio.xz cdroot/boot
 cp -v vmlinuz cdroot/boot
 
+FILENAME="MireAnmicat $VERSION"
+sed -i "s/ISONAME/$FILENAME/g" cdroot/isolinux/isolinux.cfg
+sed -i "s/ISONAME/$FILENAME/g" cdroot/boot/grub/grub.cfg
+
 dd if=/dev/zero of=cdroot/boot/grub/efi.img bs=1M count=1
 mkfs.vfat cdroot/boot/grub/efi.img
 mmd -i cdroot/boot/grub/efi.img efi efi/boot

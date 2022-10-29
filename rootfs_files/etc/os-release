@@ -1,6 +1,5 @@
-NAME="Anmincat"
-PRETTY_NAME="Anmincat"
-ID=anmincat
-BUILD_ID=1.8
-HOME_URL="https://anmincat.github.io"
-SUPPORT_URL="https://github.com/Anmincat"
+NAME="MireAnmincat"
+PRETTY_NAME="MireAnmincat"
+ID=mireanmincat
+HOME_URL="https://mire-anmincat.github.io"
+SUPPORT_URL="https://github.com/mire-anmincat"
